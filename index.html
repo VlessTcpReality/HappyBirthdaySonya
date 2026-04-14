@@ -1090,35 +1090,34 @@ class FireworksBlock {
   }
 }
 
-const MUSIC_SRC = 'https://cs9-4v4.vkuseraudio.ru/s/v1/acmp/C82DF3NMTTHeTfiA8Y0SMYkdEVgupmdlaBVuDYmJUHVFPU_Lk41MQgAZyYU4HvxWg5u2rWAHHI-EUhC_xfw-HdMFpkvy-WwvxUWBm7z4WnJiN6VoyUfSYv5TZ4P23eDsaOm0krIzVbdbmMJRRYJv583DIUu2GESmiTGvolwGzOdijkNNLQ.mp3?siren=1';
+const MUSIC_SRC = 'forever%20Young.mp3';
 const MUSIC_YT_ID = '98l81CvW7IQ';
+const MUSIC_SWITCH_AT = 100;
 
 class MusicBlock {
   #audio = new Audio(MUSIC_SRC);
   #btn = document.getElementById('music-btn');
   #ytContainer = null;
   #ytIframe = null;
-  #mode = 'vk';
+  #mode = 'local';
   #started = false;
   #userPaused = false;
-  #failCount = 0;
-  #heartbeat = null;
 
   constructor() {
-    this.#audio.loop = true;
     this.#audio.preload = 'auto';
     this.#audio.volume = 1;
 
-    this.#audio.addEventListener('play',    () => this.#updateBtn());
-    this.#audio.addEventListener('pause',   () => this.#updateBtn());
-    this.#audio.addEventListener('ended',   () => this.#onVkFail());
-    this.#audio.addEventListener('error',   () => this.#onVkFail());
-    this.#audio.addEventListener('stalled', () => this.#scheduleRecoverOrFallback());
+    this.#audio.addEventListener('play', () => this.#updateBtn());
+    this.#audio.addEventListener('pause', () => this.#updateBtn());
+    this.#audio.addEventListener('error', () => this.#switchToYt());
+    this.#audio.addEventListener('timeupdate', () => {
+      if (this.#mode === 'local' && this.#audio.currentTime >= MUSIC_SWITCH_AT) {
+        this.#switchToYt();
+      }
+    });
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.#started && !this.#userPaused) {
-        this.#resumeCurrent();
-      }
+      if (!document.hidden && this.#started && !this.#userPaused) this.#resumeCurrent();
     });
 
     bus.on('app:music-start', () => this.#start());
@@ -1135,35 +1134,7 @@ class MusicBlock {
     this.#started = true;
     this.#btn.classList.add('visible');
     this.#btn.setAttribute('aria-hidden', 'false');
-    this.#audio.play().catch(() => this.#onVkFail());
-    this.#startHeartbeat();
-  }
-
-  #startHeartbeat() {
-    clearInterval(this.#heartbeat);
-    this.#heartbeat = setInterval(() => {
-      if (!this.#started || this.#userPaused || this.#mode === 'yt') return;
-      if (this.#audio.paused) this.#scheduleRecoverOrFallback();
-    }, 4000);
-  }
-
-  #scheduleRecoverOrFallback() {
-    if (this.#userPaused || this.#mode === 'yt') return;
-    this.#failCount++;
-    if (this.#failCount >= 2) {
-      this.#switchToYt();
-    } else {
-      setTimeout(() => {
-        if (!this.#userPaused && this.#mode === 'vk' && this.#audio.paused) {
-          this.#audio.play().catch(() => this.#switchToYt());
-        }
-      }, 1200);
-    }
-  }
-
-  #onVkFail() {
-    if (this.#userPaused || this.#mode === 'yt') return;
-    this.#switchToYt();
+    this.#audio.play().catch(() => this.#switchToYt());
   }
 
   #switchToYt() {
@@ -1171,7 +1142,6 @@ class MusicBlock {
     this.#mode = 'yt';
     this.#audio.pause();
     this.#audio.src = '';
-    clearInterval(this.#heartbeat);
 
     this.#ytIframe = document.createElement('iframe');
     this.#ytIframe.allow = 'autoplay; encrypted-media';
@@ -1183,10 +1153,10 @@ class MusicBlock {
   }
 
   #resumeCurrent() {
-    if (this.#mode === 'vk') {
-      this.#audio.play().catch(() => this.#onVkFail());
-    } else if (this.#ytIframe) {
-      this.#ytIframe.contentWindow?.postMessage(
+    if (this.#mode === 'local') {
+      this.#audio.play().catch(() => this.#switchToYt());
+    } else {
+      this.#ytIframe?.contentWindow?.postMessage(
         JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*'
       );
     }
@@ -1194,7 +1164,7 @@ class MusicBlock {
 
   #toggle() {
     if (!this.#started) return;
-    if (this.#mode === 'vk') {
+    if (this.#mode === 'local') {
       if (this.#audio.paused) {
         this.#userPaused = false;
         this.#audio.play().catch(() => {});
@@ -1213,7 +1183,7 @@ class MusicBlock {
   }
 
   #updateBtn() {
-    const playing = this.#mode === 'vk' ? !this.#audio.paused : !this.#userPaused;
+    const playing = this.#mode === 'local' ? !this.#audio.paused : !this.#userPaused;
     this.#btn.textContent = playing ? '⏸' : '🎵';
     this.#btn.setAttribute('aria-label', playing ? 'Пауза' : 'Включить музыку');
   }
