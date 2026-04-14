@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0a">
+<title>Happy Birthday, Sonya! 🎉</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+@layer reset, base, layout, components, utilities;
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  img, svg { display: block; max-inline-size: 100%; }
+  button { font: inherit; cursor: pointer; border: none; background: none; }
+  input { font: inherit; }
+  ul, ol { list-style: none; }
+  blockquote { quotes: none; }
+}
+
+@layer base {
+  :root {
+    --bg: oklch(7% 0 0);
+    --bg-card: oklch(12% .005 320);
+    --bg-field: oklch(16% .008 320);
+    --bg-field-focus: oklch(20% .012 320);
+    --pink: oklch(56% .29 0);
+    --pink-bright: oklch(65% .32 0);
+    --pink-dim: oklch(42% .2 0);
+    --pink-glow: oklch(56% .29 0 / .35);
+    --gold: oklch(76% .14 75);
+    --gold-glow: oklch(76% .14 75 / .3);
+    --crimson: oklch(52% .24 20);
+    --text: oklch(97% 0 0);
+    --text-dim: oklch(68% .04 320);
+    --text-muted: oklch(45% .03 320);
+    --success: oklch(67% .18 145);
+    --error: oklch(60% .22 25);
+    --border: oklch(22% .01 320);
+    --border-active: oklch(56% .29 0 / .5);
+
+    --jennie: oklch(76% .14 75);
+    --jisoo: oklch(74% .09 295);
+    --rose: oklch(72% .22 355);
+    --lisa: oklch(64% .23 160);
+    --freen: oklch(72% .12 215);
+    --becky: oklch(74% .17 58);
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Barlow', system-ui, sans-serif;
+
+    --radius: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+
+    --shadow-pink: 0 0 24px var(--pink-glow), 0 0 48px oklch(56% .29 0 / .15);
+    --shadow-gold: 0 0 20px var(--gold-glow);
+    --shadow-card: 0 4px 24px oklch(0% 0 0 / .4);
+
+    --dur-fast: 150ms;
+    --dur-mid: 300ms;
+    --dur-slow: 500ms;
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
+  }
+
+  html {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  body {
+    min-block-size: 100dvh;
+    overflow-x: clip;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--pink);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  :is(button, a, input, select, textarea) { touch-action: manipulation; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+@layer layout {
+  .app {
+    display: flex;
+    justify-content: center;
+    min-block-size: 100dvh;
+    background:
+      radial-gradient(ellipse 90% 55% at 15% 110%, oklch(56% .29 0 / .06), transparent),
+      radial-gradient(ellipse 70% 45% at 85% -10%, oklch(76% .14 75 / .05), transparent),
+      var(--bg);
+  }
+
+  .container {
+    width: 100%;
+    max-inline-size: 480px;
+    min-block-size: 100dvh;
+    position: relative;
+    display: grid;
+    grid-template-rows: 1fr;
+  }
+
+  .screen {
+    display: none;
+    flex-direction: column;
+    min-block-size: 100dvh;
+    padding: 28px 20px 36px;
+    position: relative;
+    overflow-x: clip;
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .screen.active {
+    display: flex;
+    animation: screenIn var(--dur-slow) var(--ease-out) both;
+  }
+
+  .screen.leaving {
+    display: flex;
+    animation: screenOut var(--dur-mid) ease-in both;
+    pointer-events: none;
+  }
+
+  .screen-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-inline-size: 440px;
+    margin-inline: auto;
+    width: 100%;
+  }
+}
+
+@layer components {
+  .deco-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--pink-dim);
+    font-size: .75rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+
+    &::before, &::after {
+      content: '';
+      flex: 1;
+      block-size: 1px;
+      background: linear-gradient(90deg, transparent, var(--pink-dim), transparent);
+    }
+  }
+
+  .title-display {
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 8vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+    text-wrap: balance;
+
+    em {
+      font-style: italic;
+      color: var(--pink-bright);
+      text-shadow: var(--shadow-pink);
+    }
+  }
+
+  .subtitle {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: .95rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  .narrator-transition {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 4vw, 1.4rem);
+    color: var(--pink-bright);
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 8px;
+    animation: fadeInText 1s ease-in-out;
+  }
+
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    inline-size: 100%;
+    min-block-size: 54px;
+    padding-inline: 24px;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, var(--pink), var(--crimson));
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    transition: opacity var(--dur-fast), transform var(--dur-fast), box-shadow var(--dur-mid);
+    box-shadow: var(--shadow-pink);
+    margin-block-start: auto;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 0 32px var(--pink-glow), 0 0 64px oklch(56% .29 0 / .2);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) { transform: translateY(0) scale(.98); }
+
+    &:disabled {
+      opacity: .35;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+  }
+
+  .field-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+
+    label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    input {
+      inline-size: 100%;
+      min-block-size: 50px;
+      padding: 12px 16px;
+      background: var(--bg-field);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color var(--dur-fast), background var(--dur-fast), box-shadow var(--dur-fast);
+
+      &::placeholder { color: var(--text-muted); }
+
+      &:focus {
+        outline: none;
+        border-color: var(--border-active);
+        background: var(--bg-field-focus);
+        box-shadow: 0 0 0 3px oklch(56% .29 0 / .12);
+      }
+
+      &[aria-invalid="true"] {
+        border-color: var(--error);
+        box-shadow: 0 0 0 3px oklch(60% .22 25 / .15);
+      }
+
+      &[readonly] {
+        background: oklch(20% .05 145 / .3);
+        border-color: var(--success);
+        color: var(--success);
+        cursor: default;
+      }
+    }
+  }
+
+  .error-msg, .error-area {
+    font-size: .85rem;
+    color: var(--error);
+    min-block-size: 1.2em;
+    transition: opacity var(--dur-fast);
+  }
+
+  .hint-msg, .hint-area {
+    background: oklch(56% .29 0 / .08);
+    border: 1px solid oklch(56% .29 0 / .2);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: .88rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .hidden { display: none !important; }
+
+  .pw-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 1fr 1fr;
+    gap: 8px;
+
+    input {
+      text-align: center;
+      font-size: 1.1rem;
+      padding-inline: 6px;
+    }
+  }
+
+  .quest-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .char-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    background: oklch(100% 0 0 / .04);
+    border: 1px solid oklch(100% 0 0 / .08);
+
+    .char-emoji { font-size: 1.2rem; line-height: 1; }
+
+    .char-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--char-color, var(--pink));
+      text-shadow: 0 0 16px color-mix(in oklch, var(--char-color, var(--pink)), transparent 40%);
+    }
+  }
+
+  .balance-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: oklch(100% 0 0 / .04);
+    border: 1px solid oklch(100% 0 0 / .08);
+    border-radius: 100px;
+    font-size: .9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .balance-delta-anim {
+    position: absolute;
+    inset-block-end: 110%;
+    inset-inline-end: 8px;
+    font-size: .8rem;
+    font-weight: 700;
+    pointer-events: none;
+    animation: floatUp 1.1s var(--ease-out) both;
+
+    &.positive { color: var(--success); }
+    &.negative { color: var(--error); }
+  }
+
+  .quest-intro {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 4vw, 1.35rem);
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--text);
+    text-wrap: pretty;
+    padding: 16px 20px;
+    background: oklch(100% 0 0 / .03);
+    border-inline-start: 3px solid var(--char-color, var(--pink));
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .questions-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-block-size: 45vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--pink-dim) transparent;
+    padding-inline-end: 8px;
+  }
+
+  .questions-area::-webkit-scrollbar { width: 6px; }
+  .questions-area::-webkit-scrollbar-track { background: transparent; }
+  .questions-area::-webkit-scrollbar-thumb { background: var(--pink-dim); border-radius: 10px; }
+
+  .question-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .question-label {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--char-color, var(--pink));
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .question-text {
+      font-size: .95rem;
+      color: var(--text-dim);
+      line-height: 1.55;
+      text-wrap: pretty;
+    }
+  }
+
+  .wish-inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+
+    .wish-deco {
+      font-size: 1.5rem;
+      letter-spacing: .5em;
+      color: var(--gold);
+      text-shadow: var(--shadow-gold);
+      animation: sparkleGlow 2s ease-in-out infinite alternate;
+    }
+
+    .wish-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 6vw, 2.1rem);
+      font-weight: 700;
+      color: var(--text);
+
+      em {
+        font-style: italic;
+        color: var(--pink-bright);
+      }
+    }
+
+    .wish-text-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 22px 20px;
+      text-align: start;
+      min-block-size: 120px;
+      max-block-size: 45vh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: var(--pink-dim) transparent;
+    }
+
+    .wish-text-wrap::-webkit-scrollbar { width: 6px; }
+    .wish-text-wrap::-webkit-scrollbar-track { background: transparent; }
+    .wish-text-wrap::-webkit-scrollbar-thumb { background: var(--pink-dim); border-radius: 10px; }
+
+    .wish-text {
+      font-size: 1rem;
+      line-height: 1.75;
+      color: var(--text-dim);
+      text-wrap: pretty;
+    }
+
+    .wish-balance {
+      font-size: .9rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+
+      strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+    }
+  }
+
+  .final-inner {
+    align-items: center;
+    text-align: center;
+    padding-block: 40px;
+
+    .final-deco {
+      font-size: 2rem;
+      letter-spacing: .4em;
+      animation: sparkleGlow 1.5s ease-in-out infinite alternate;
+    }
+
+    .final-card {
+      background: linear-gradient(135deg, oklch(14% .015 320), oklch(10% .01 320));
+      border: 1px solid oklch(56% .29 0 / .25);
+      border-radius: var(--radius-xl);
+      padding: 28px 24px;
+      box-shadow: var(--shadow-pink), inset 0 1px 0 oklch(100% 0 0 / .06);
+      max-inline-size: 380px;
+      position: relative;
+
+      &::before {
+        content: '♡';
+        position: absolute;
+        inset-block-start: -14px;
+        inset-inline-start: 50%;
+        transform: translateX(-50%);
+        font-size: 1.6rem;
+        color: var(--pink);
+        text-shadow: var(--shadow-pink);
+        background: var(--bg);
+        padding-inline: 8px;
+      }
+    }
+
+    .final-quote {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem, 4vw, 1.3rem);
+      font-style: italic;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .final-from {
+      font-size: .9rem;
+      color: var(--text-dim);
+      margin-block-start: 12px;
+    }
+
+    .final-reward {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .reward-label {
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        color: var(--text-muted);
+      }
+
+      .reward-amount {
+        font-family: var(--font-display);
+        font-size: clamp(2.4rem, 10vw, 3.2rem);
+        font-weight: 700;
+        color: var(--gold);
+        text-shadow: var(--shadow-gold), 0 0 60px oklch(76% .14 75 / .25);
+        animation: rewardPulse 2s ease-in-out infinite;
+        opacity: 0;
+        animation-delay: .8s;
+        animation-fill-mode: both;
+      }
+    }
+  }
+
+  #toast {
+    position: fixed;
+    inset-block-end: 24px;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    background: oklch(20% .01 0);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 10px 20px;
+    font-size: .88rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity var(--dur-mid);
+    pointer-events: none;
+
+    &.visible { opacity: 1; }
+  }
+}
+
+  .music-btn {
+    position: fixed;
+    inset-block-end: 28px;
+    inset-inline-end: 20px;
+    z-index: 200;
+    inline-size: 48px;
+    block-size: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--crimson));
+    box-shadow: var(--shadow-pink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-mid), transform var(--dur-fast);
+    transform: scale(0.8);
+
+    &.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    &:hover { transform: scale(1.08); box-shadow: 0 0 32px var(--pink-glow); }
+    &:active { transform: scale(0.95); }
+  }
+
+  .shake { animation: shake .4s ease both !important; }
+  .text-center { text-align: center; }
+  .w-full { inline-size: 100%; }
+}
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes screenOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-12px); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+@keyframes floatUp {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-28px); }
+}
+
+@keyframes sparkleGlow {
+  from { opacity: .7; text-shadow: 0 0 10px currentColor; }
+  to { opacity: 1; text-shadow: 0 0 24px currentColor, 0 0 48px currentColor; }
+}
+
+@keyframes rewardPulse {
+  0%, 100% { text-shadow: 0 0 20px var(--gold-glow); }
+  50% { text-shadow: 0 0 40px var(--gold-glow), 0 0 80px oklch(76% .14 75 / .15); }
+}
+
+@keyframes fadeInText {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+@media (min-width: 520px) {
+  .container { box-shadow: 0 0 80px oklch(0% 0 0 / .5); }
+  .screen { padding-inline: 32px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="container">
+
+    <div id="screen-password" class="screen active" role="region" aria-labelledby="pw-title">
+      <div class="screen-inner" style="justify-content: center; gap: 32px;">
+        <header style="display:flex;flex-direction:column;gap:16px;text-align:center;padding-block-start:24px;">
+          <div class="deco-line" aria-hidden="true">✦ особый день ✦</div>
+          <h1 id="pw-title" class="title-display">Happy Birthday,<br><em>Sonya!</em> 🎉</h1>
+          <p class="subtitle">Привет, Соня! Тебя ждёт особый сюрприз от меня.<br>Докажи, что это именно ты — введи дату и время нашего с тобой знакомства.</p>
+        </header>
+
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <p style="font-size:.8rem;font-weight:500;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;">Дата и время знакомства</p>
+            <div class="pw-grid" role="group" aria-label="Поля даты и времени">
+              <div class="field-wrap">
+                <label for="pw-day">День</label>
+                <input type="tel" id="pw-day" placeholder="ДД" maxlength="2" inputmode="numeric" autocomplete="off" aria-required="true">
+              </div>
+              <div class="field-wrap">
+                <label for="pw-month">Месяц</label>
+                <input type="tel" id="pw-month" placeholder="ММ" maxlength="2" inputmode="numeric" autocomplete="off" aria-required="true">
+              </div>
+              <div class="field-wrap">
+                <label for="pw-year">Год</label>
+                <input type="tel" id="pw-year" placeholder="ГГГГ" maxlength="4" inputmode="numeric" autocomplete="off" aria-required="true">
+              </div>
+              <div class="field-wrap">
+                <label for="pw-hour">Часы</label>
+                <input type="tel" id="pw-hour" placeholder="ЧЧ" maxlength="2" inputmode="numeric" autocomplete="off" aria-required="true">
+              </div>
+              <div class="field-wrap">
+                <label for="pw-min">Мин</label>
+                <input type="tel" id="pw-min" placeholder="ММ" maxlength="2" inputmode="numeric" autocomplete="off" aria-required="true">
+              </div>
+            </div>
+          </div>
+
+          <div id="pw-error" class="error-msg" role="alert" aria-live="assertive" aria-atomic="true"></div>
+          <div id="pw-hint" class="hint-msg hidden" aria-live="polite">
+            💡 Подсказка: Помнишь, я поздравил тебя с днём рождения на один день позже? 🎂
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-enter" type="button">Войти в квест ✨</button>
+      </div>
+    </div>
+
+    <div id="screen-quest" class="screen" role="region" aria-label="Испытание"></div>
+    <div id="screen-wish" class="screen" role="region" aria-label="Пожелание"></div>
+
+    <div id="screen-final" class="screen" role="region" aria-labelledby="final-title">
+      <div class="screen-inner final-inner">
+        <div class="final-deco" aria-hidden="true">🎊 ✦ 🎉 ✦ 🎊</div>
+        <h1 id="final-title" class="title-display">С днём рождения,<br><em>Соня!</em> 🎂</h1>
+        <div class="final-card" aria-label="Открытка">
+          <blockquote class="final-quote">
+            Я за тобой куда угодно.
+          </blockquote>
+          <p class="final-from">— С любовью, от меня ❤️</p>
+        </div>
+        <div class="final-reward">
+          <span class="reward-label">Твоя награда</span>
+          <span class="reward-amount" id="final-amount" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<button id="music-btn" class="music-btn" aria-label="Включить музыку" aria-hidden="true">🎵</button>
+<canvas id="fireworks-canvas" aria-hidden="true" style="display:none;position:fixed;inset:0;z-index:999;pointer-events:none;width:100%;height:100%"></canvas>
+
+<div id="aria-live-polite" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+<div id="aria-live-assertive" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+<div id="toast" role="status" aria-atomic="true"></div>
+
+<script>
+(() => {
+const STORAGE_PROGRESS = 'birthday_sonya_progress';
+const STORAGE_BALANCE = 'birthday_sonya_balance';
+const PASSWORD = { day: 16, month: 4, year: 2020, hour: 18, minute: 23 };
+const TOAST_DUR = 3500;
+const TYPEWRITER_SPEED = 28;
+const FIREWORK_DUR = 3500;
+const WRONG_MSGS = [
+  'Не совсем... попробуй ещё! 💪',
+  'Хм, не то... ты точно знаешь! 🤔',
+  'Почти! Но нет 😅 Давай ещё раз!',
+  'Нет... но ты близко! 🔍'
+];
+
+const ANSWERS = {
+  q1:   v => v === 'суп',
+  q2_1: v => v === 'кровать',
+  q2_2: v => v === 'микроволновка',
+  q2_3: v => v === 'плафон',
+  q3:   v => v === 'поцелуй',
+  q4:   v => v === 'буквоед' || v === 'пвз',
+  q5:   v => v === 'настя' || v === 'соня' || v === 'я' || v === 'данил',
+  q6_1: v => parseInt(v.replace(/[\s,]/g, '')) === 6000,
+  q6_2: v => v === 'чай',
+};
+
+const QUEST_CONFIG = {
+  quest1: {
+    character: 'Дженни', from: 'Дженни', emoji: '💎', colorVar: '--jennie',
+    intro: 'Данечка как-то отказался это есть, и ты вылила это прямо в унитаз. Что же это было? 👀',
+    questions: [{
+      id: 'q1', placeholder: 'Введи ответ...',
+      hint: 'Это что-то жидкое и горячее, что обычно едят ложкой 🥄'
+    }]
+  },
+  quest2: {
+    character: 'Джису', from: 'Джису', emoji: '🌸', colorVar: '--jisoo',
+    intro: 'Вспомни маленькие катастрофы с Данечкой 😇 Что именно вы с ним сломали?',
+    questions: [
+      { id: 'q2_1', label: 'Квартира на Гагарина',
+        question: 'Что мы сломали в квартире на Гагарина?',
+        placeholder: 'Введи ответ...',
+        hint: 'На ней обычно спят 🛏️' },
+      { id: 'q2_2', label: 'Кузьмина, 17',
+        question: 'Что мы сломали в квартире на подводника Кузьмина, 17?',
+        placeholder: 'Введи ответ...',
+        hint: 'Разогревает еду, стоит на кухне 🍽️' },
+      { id: 'q2_3', label: 'Авиаторов Балтики, 13',
+        question: 'Что мы сломали на проспекте Авиаторов Балтики, 13?',
+        placeholder: 'Введи ответ...',
+        hint: 'Часть светильника, стеклянное 💡' }
+    ]
+  },
+  quest3: {
+    character: 'Розе', from: 'Розе', emoji: '🌹', colorVar: '--rose',
+    intro: 'Зима. Снег. Ты и Алина. Что же произошло между вами впервые? ❄️',
+    questions: [{
+      id: 'q3', placeholder: 'Введи ответ...',
+      hint: 'Это бывает нежным, под снегопадом... 💋'
+    }]
+  },
+  quest4: {
+    character: 'Лиса', from: 'Лисы', emoji: '🐆', colorVar: '--lisa',
+    intro: 'На какой работе ты оставила самый незабываемый след? 😈 Я знаю, ты помнишь!',
+    questions: [{
+      id: 'q4', placeholder: 'Введи ответ...',
+      hint: 'Одно место — книжный магазин, второе — пункт выдачи заказов 📦'
+    }]
+  },
+  quest5: {
+    character: 'Фрин', from: 'Фрин', emoji: '🎮', colorVar: '--freen',
+    intro: 'Кто в вашей компании стал автором легендарного мема «Беда обида, Steam не запускается, не запускается»? 🎮',
+    questions: [{
+      id: 'q5', placeholder: 'Введи имя...',
+      hint: 'Это кто-то из нашей троицы — Настя, ты или я 🤔'
+    }]
+  },
+  quest6: {
+    character: 'Бэки', from: 'Бэки', emoji: '💸', colorVar: '--becky',
+    intro: 'Последнее испытание! Вспомни самый первый и очень вкусный момент с Данечкой 💸',
+    questions: [
+      { id: 'q6_1', question: 'Сколько Даня перевёл тебе в самый первый раз? (цифрами)',
+        placeholder: 'Введи сумму...',
+        hint: 'Это число в тысячах, на него можно было купить что-то вкусное 🍜' },
+      { id: 'q6_2', question: 'Какой напиток ты пила в тот момент и подавилась им?',
+        placeholder: 'Введи напиток...',
+        hint: 'Горячий, часто пьют с молоком или лимоном ☕' }
+    ]
+  }
+};
+
+const WISH_CONFIG = {
+  wish1: {
+    deco: '✦ 💎 ✦',
+    title: 'Пожелание Дженни',
+    from: 'Дженни',
+    text: 'Желаю тебе финансовой свободы — настоящей, без оглядки назад. Чтобы ни один долг не омрачал твои дни, а деньги приходили легко и уходили только на то, что приносит тебе радость и мечты. Пусть твой кошелёк пополняется так же стремительно, как растёт твоя улыбка. Ты заслуживаешь всего лучшего — и в финансах тоже! 💰✨',
+    button: 'К следующему испытанию →'
+  },
+  wish2: {
+    deco: '✦ 🌸 ✦',
+    title: 'Пожелание Джису',
+    from: 'Джису',
+    text: 'Желаю, чтобы рядом с тобой всегда были люди, которые любят тебя по-настоящему — без условий и без притворства. Те, кто приходит не только в праздники, но и в обычный серый вторник. Кто не уйдёт в самый важный момент и чьё присутствие делает жизнь теплее. Ты умеешь любить так искренне — пусть эта же искренность возвращается к тебе сторицей. 🤍',
+    button: 'Продолжить →'
+  },
+  wish3: {
+    deco: '✦ 🌹 ✦',
+    title: 'Пожелание Розе',
+    from: 'Розе',
+    text: 'Желаю тебе помнить о себе — не только о других. Слушать своё тело, когда оно устало. Слушать своё сердце, когда ему больно. Позволять себе отдыхать без вины, баловать себя без повода, говорить «нет», когда нужно. Ты — главный человек в своей жизни. Береги её нежно и заботливо, как самое дорогое, что у тебя есть. 🌸',
+    button: 'Дальше →'
+  },
+  wish4: {
+    deco: '✦ 🐆 ✦',
+    title: 'Пожелание Лисы',
+    from: 'Лисы',
+    text: 'Желаю тебе смелости — следовать за тем, что зажигает твои глаза. Не бояться начинать, не бояться ошибаться, не бояться быть яркой и заметной. Ты уже оставляешь незабываемый след везде, куда приходишь — пусть этот след будет гордым и крупным. Мир должен знать о тебе больше! 🔥',
+    button: 'Дальше →'
+  },
+  wish5: {
+    deco: '✦ 🎮 ✦',
+    title: 'Пожелание Фрин',
+    from: 'Фрин',
+    text: 'Желаю тебе лёгкости — в самых обычных вещах. Смеяться до слёз над глупыми мемами. Играть, даже когда всё не запускается. Находить радость в маленьких моментах, которые потом становятся лучшими воспоминаниями. Пусть в твоей жизни всегда будет место для такого вот беззаботного, искреннего счастья. 🌟',
+    button: 'Дальше →'
+  },
+  wish6: {
+    deco: '✦ 💸 ✦',
+    title: 'Пожелание Бэки',
+    from: 'Бэки',
+    text: 'Ты дошла до финала — значит, ты именно та, о которой Данечка рассказывал с такой теплотой. Желаю тебе богатства во всём: в любви, в дружбе, в ярких моментах и, конечно, в деньгах. Пусть каждый перевод на твою карту приносит такую же неожиданную радость, как в тот самый первый раз — когда ты подавилась чаем от удивления 😄 С днём рождения, Соня! 💸✨',
+    button: 'Дальше →'
+  },
+  wish7: {
+    deco: '✦ 💖 ✦',
+    title: 'Моё пожелание',
+    from: 'меня',
+    text: 'Ты дошла до конца — и это не случайно, потому что ты такая. Настойчивая, умная, живая. Желаю тебе, чтобы каждый новый год твоей жизни был ярче предыдущего. Чтобы сбывалось то, во что ты даже боишься верить. Чтобы рядом были люди, которые знают тебя настоящую и выбирают тебя снова и снова. Ты особенная. Не забывай об этом никогда. 💖',
+    button: 'Открыть подарок 🎁'
+  }
+};
+
+const AFTER_QUEST = { quest1:'wish1', quest2:'wish2', quest3:'wish3', quest4:'wish4', quest5:'wish5', quest6:'wish6' };
+const AFTER_WISH = { wish1:'quest2', wish2:'quest3', wish3:'quest4', wish4:'quest5', wish5:'quest6', wish6:'wish7', wish7:'final' };
+
+const eh = s => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+const ea = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+const fmt = n => n.toLocaleString('ru-RU') + ' ₽';
+
+class Store {
+  #progress;
+  #balance;
+
+  constructor() {
+    this.#progress = this.#loadProgress();
+    this.#balance = this.#loadBalance();
+  }
+
+  #loadProgress() {
+    try {
+      const raw = localStorage.getItem(STORAGE_PROGRESS);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return {
+      currentScreen: 'password',
+      passwordAttempts: 0,
+      passwordHintShown: false,
+      solvedQuestions: {},
+      questionAttempts: {},
+      hintShown: {}
+    };
+  }
+
+  #loadBalance() {
+    try {
+      const raw = localStorage.getItem(STORAGE_BALANCE);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return { amount: 1000 };
+  }
+
+  #save() {
+    try {
+      localStorage.setItem(STORAGE_PROGRESS, JSON.stringify(this.#progress));
+      localStorage.setItem(STORAGE_BALANCE, JSON.stringify(this.#balance));
+    } catch {
+      bus.emit('app:toast', { msg: 'Не удалось сохранить прогресс. При закрытии браузера прогресс может не сохраниться.' });
+    }
+  }
+
+  getProgress() { return structuredClone(this.#progress); }
+  getBalance() { return this.#balance.amount; }
+
+  setScreen(screen) { this.#progress.currentScreen = screen; this.#save(); }
+  incPasswordAttempts() { this.#progress.passwordAttempts++; this.#save(); }
+  setPasswordHintShown() { this.#progress.passwordHintShown = true; this.#save(); }
+
+  solveQuestion(id) {
+    this.#progress.solvedQuestions[id] = true;
+    this.#balance.amount += 500;
+    this.#save();
+    return this.#balance.amount;
+  }
+
+  wrongAnswer(id) {
+    this.#progress.questionAttempts[id] = (this.#progress.questionAttempts[id] || 0) + 1;
+    this.#balance.amount -= 500;
+    this.#save();
+    return { attempts: this.#progress.questionAttempts[id], balance: this.#balance.amount };
+  }
+
+  showHint(id) {
+    this.#progress.hintShown[id] = true;
+    this.#save();
+  }
+}
+
+class EventBus extends EventTarget {
+  emit(name, detail = {}) { this.dispatchEvent(new CustomEvent(name, { detail })); }
+  on(name, fn) { this.addEventListener(name, fn); }
+}
+
+const store = new Store();
+const bus = new EventBus();
+
+class ToastBlock {
+  #el = document.getElementById('toast');
+  #timer = null;
+  constructor() {
+    bus.on('app:toast', e => this.#show(e.detail.msg, e.detail.dur ?? TOAST_DUR));
+  }
+  #show(msg, dur) {
+    this.#el.textContent = msg;
+    this.#el.classList.add('visible');
+    clearTimeout(this.#timer);
+    this.#timer = setTimeout(() => {
+      this.#el.classList.remove('visible');
+    }, dur);
+  }
+}
+
+class AnnounceBlock {
+  #polite = document.getElementById('aria-live-polite');
+  #assertive = document.getElementById('aria-live-assertive');
+  constructor() {
+    bus.on('app:announce-polite', e => this.#say(this.#polite, e.detail.msg));
+    bus.on('app:announce-assertive', e => this.#say(this.#assertive, e.detail.msg));
+  }
+  #say(el, msg) {
+    el.textContent = '';
+    setTimeout(() => { el.textContent = msg; }, 100);
+  }
+}
+
+class FireworksBlock {
+  #canvas = document.getElementById('fireworks-canvas');
+  #ctx;
+  #particles = [];
+  #raf = null;
+  #burstTimers = [];
+  #lastTime = 0;
+
+  constructor() {
+    this.#ctx = this.#canvas.getContext('2d');
+    bus.on('app:fireworks', e => this.#launch(e.detail?.onComplete));
+  }
+
+  #launch(onComplete) {
+    cancelAnimationFrame(this.#raf);
+    this.#burstTimers.forEach(clearTimeout);
+    this.#burstTimers = [];
+    this.#particles = [];
+    this.#canvas.width = window.innerWidth;
+    this.#canvas.height = window.innerHeight;
+    this.#canvas.style.display = 'block';
+
+    const burst = (xFactor = .5, yFactor = .35) => {
+      const x = this.#canvas.width * xFactor;
+      const y = this.#canvas.height * yFactor;
+      const colors = ['#ff0090', '#ff66bb', '#e6c87a', '#ffffff', '#cc2244', '#ff44aa', '#ffe066'];
+      for (let i = 0; i < 70; i++) {
+        const angle = (Math.PI * 2 * i) / 70 + (Math.random() - .5) * .3;
+        const speed = 1.5 + Math.random() * 4.5;
+        this.#particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1.2,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          life: 1,
+          size: 2 + Math.random() * 3.5
+        });
+      }
+    };
+
+    const schedule = (fn, delay) => { this.#burstTimers.push(setTimeout(fn, delay)); };
+
+    burst(.5, .3);
+    schedule(() => burst(.25, .4), 400);
+    schedule(() => burst(.75, .35), 700);
+    schedule(() => burst(.5, .5), 1100);
+    schedule(() => burst(.35, .25), 1400);
+    schedule(() => burst(.65, .45), 1750);
+    schedule(() => burst(.5, .3), 2200);
+
+    const startTime = performance.now();
+    this.#lastTime = performance.now();
+    
+    const animate = (currentTime) => {
+      const dt = (currentTime - this.#lastTime) / 16.666;
+      this.#lastTime = currentTime;
+
+      this.#ctx.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
+      this.#particles = this.#particles.filter(p => p.life > 0.01);
+      
+      for (const p of this.#particles) {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 0.045 * dt; // Soft gravity
+        p.vx *= Math.pow(0.985, dt); // Smooth friction
+        p.life -= 0.007 * dt; // Slow fade
+        
+        this.#ctx.globalAlpha = Math.min(1, p.life * 2);
+        this.#ctx.fillStyle = p.color;
+        this.#ctx.beginPath();
+        this.#ctx.arc(p.x, p.y, p.size * p.life + .5, 0, Math.PI * 2);
+        this.#ctx.fill();
+      }
+      this.#ctx.globalAlpha = 1;
+      
+      if (currentTime - startTime < FIREWORK_DUR) {
+        this.#raf = requestAnimationFrame(animate);
+      } else {
+        this.#canvas.style.display = 'none';
+        this.#particles = [];
+        onComplete?.();
+      }
+    };
+    this.#raf = requestAnimationFrame(animate);
+  }
+}
+
+const MUSIC_SRC = 'https://cs9-4v4.vkuseraudio.ru/s/v1/acmp/C82DF3NMTTHeTfiA8Y0SMYkdEVgupmdlaBVuDYmJUHVFPU_Lk41MQgAZyYU4HvxWg5u2rWAHHI-EUhC_xfw-HdMFpkvy-WwvxUWBm7z4WnJiN6VoyUfSYv5TZ4P23eDsaOm0krIzVbdbmMJRRYJv583DIUu2GESmiTGvolwGzOdijkNNLQ.mp3?siren=1';
+const MUSIC_YT_ID = '98l81CvW7IQ';
+
+class MusicBlock {
+  #audio = new Audio(MUSIC_SRC);
+  #btn = document.getElementById('music-btn');
+  #ytContainer = null;
+  #ytIframe = null;
+  #mode = 'vk';
+  #started = false;
+  #userPaused = false;
+  #failCount = 0;
+  #heartbeat = null;
+
+  constructor() {
+    this.#audio.loop = true;
+    this.#audio.preload = 'auto';
+    this.#audio.volume = 1;
+
+    this.#audio.addEventListener('play',    () => this.#updateBtn());
+    this.#audio.addEventListener('pause',   () => this.#updateBtn());
+    this.#audio.addEventListener('ended',   () => this.#onVkFail());
+    this.#audio.addEventListener('error',   () => this.#onVkFail());
+    this.#audio.addEventListener('stalled', () => this.#scheduleRecoverOrFallback());
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.#started && !this.#userPaused) {
+        this.#resumeCurrent();
+      }
+    });
+
+    bus.on('app:music-start', () => this.#start());
+    this.#btn.addEventListener('click', () => this.#toggle());
+
+    this.#ytContainer = document.createElement('div');
+    this.#ytContainer.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;inset-block-start:-200px;overflow:hidden;';
+    this.#ytContainer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(this.#ytContainer);
+  }
+
+  #start() {
+    if (this.#started) return;
+    this.#started = true;
+    this.#btn.classList.add('visible');
+    this.#btn.setAttribute('aria-hidden', 'false');
+    this.#audio.play().catch(() => this.#onVkFail());
+    this.#startHeartbeat();
+  }
+
+  #startHeartbeat() {
+    clearInterval(this.#heartbeat);
+    this.#heartbeat = setInterval(() => {
+      if (!this.#started || this.#userPaused || this.#mode === 'yt') return;
+      if (this.#audio.paused) this.#scheduleRecoverOrFallback();
+    }, 4000);
+  }
+
+  #scheduleRecoverOrFallback() {
+    if (this.#userPaused || this.#mode === 'yt') return;
+    this.#failCount++;
+    if (this.#failCount >= 2) {
+      this.#switchToYt();
+    } else {
+      setTimeout(() => {
+        if (!this.#userPaused && this.#mode === 'vk' && this.#audio.paused) {
+          this.#audio.play().catch(() => this.#switchToYt());
+        }
+      }, 1200);
+    }
+  }
+
+  #onVkFail() {
+    if (this.#userPaused || this.#mode === 'yt') return;
+    this.#switchToYt();
+  }
+
+  #switchToYt() {
+    if (this.#mode === 'yt') return;
+    this.#mode = 'yt';
+    this.#audio.pause();
+    this.#audio.src = '';
+    clearInterval(this.#heartbeat);
+
+    this.#ytIframe = document.createElement('iframe');
+    this.#ytIframe.allow = 'autoplay; encrypted-media';
+    this.#ytIframe.setAttribute('allowfullscreen', '');
+    this.#ytIframe.style.cssText = 'width:1px;height:1px;border:0;';
+    this.#ytIframe.src = `https://www.youtube.com/embed/${MUSIC_YT_ID}?autoplay=1&loop=1&playlist=${MUSIC_YT_ID}&controls=0&playsinline=1&enablejsapi=1`;
+    this.#ytContainer.appendChild(this.#ytIframe);
+    this.#updateBtn();
+  }
+
+  #resumeCurrent() {
+    if (this.#mode === 'vk') {
+      this.#audio.play().catch(() => this.#onVkFail());
+    } else if (this.#ytIframe) {
+      this.#ytIframe.contentWindow?.postMessage(
+        JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*'
+      );
+    }
+  }
+
+  #toggle() {
+    if (!this.#started) return;
+    if (this.#mode === 'vk') {
+      if (this.#audio.paused) {
+        this.#userPaused = false;
+        this.#audio.play().catch(() => {});
+      } else {
+        this.#userPaused = true;
+        this.#audio.pause();
+      }
+    } else {
+      const cmd = this.#userPaused ? 'playVideo' : 'pauseVideo';
+      this.#userPaused = !this.#userPaused;
+      this.#ytIframe?.contentWindow?.postMessage(
+        JSON.stringify({ event: 'command', func: cmd, args: [] }), '*'
+      );
+      this.#updateBtn();
+    }
+  }
+
+  #updateBtn() {
+    const playing = this.#mode === 'vk' ? !this.#audio.paused : !this.#userPaused;
+    this.#btn.textContent = playing ? '⏸' : '🎵';
+    this.#btn.setAttribute('aria-label', playing ? 'Пауза' : 'Включить музыку');
+  }
+}
+
+const navigate = screen => {
+  const isQuest = screen.startsWith('quest');
+  const isWish = screen.startsWith('wish');
+  const domId = isQuest ? 'screen-quest' : isWish ? 'screen-wish' : `screen-${screen}`;
+
+  if (isQuest) questBlock.render(screen);
+  else if (isWish) wishBlock.render(screen);
+  else if (screen === 'final') finalBlock.render();
+
+  const screens = document.querySelectorAll('.screen');
+  const targetEl = document.getElementById(domId);
+
+  screens.forEach(s => {
+    if (s === targetEl) return;
+    if (!s.classList.contains('active')) return;
+    s.classList.add('leaving');
+    setTimeout(() => s.classList.remove('active', 'leaving'), 350);
+  });
+
+  setTimeout(() => targetEl.classList.add('active'), 50);
+};
+
+class PasswordBlock {
+  #form;
+  #inputs;
+  #btnEnter;
+  #errorEl;
+  #hintEl;
+  #busy = false;
+
+  constructor() {
+    this.#btnEnter = document.getElementById('btn-enter');
+    this.#errorEl = document.getElementById('pw-error');
+    this.#hintEl = document.getElementById('pw-hint');
+    this.#inputs = ['pw-day','pw-month','pw-year','pw-hour','pw-min'].map(id => document.getElementById(id));
+
+    const progress = store.getProgress();
+    if (progress.passwordHintShown) this.#hintEl.classList.remove('hidden');
+
+    this.#inputs.forEach((inp, i) => {
+      inp.addEventListener('input', () => this.#onInput(inp, i));
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') this.#btnEnter.click(); });
+    });
+
+    this.#btnEnter.addEventListener('click', () => this.#submit());
+  }
+
+  #onInput(inp, idx) {
+    const max = [2, 2, 4, 2, 2][idx];
+    inp.value = inp.value.replace(/\D/g, '');
+    if (inp.value.length >= max && idx < this.#inputs.length - 1) {
+      this.#inputs[idx + 1].focus();
+    }
+  }
+
+  #submit() {
+    if (this.#busy) return;
+    const vals = this.#inputs.map(i => i.value.trim());
+    if (vals.some(v => !v)) {
+      this.#shake(this.#inputs.filter((_, i) => !vals[i]));
+      bus.emit('app:announce-assertive', { msg: 'Заполни все поля' });
+      return;
+    }
+
+    const [day, month, year, hour, minute] = vals.map(Number);
+    const correct = day === PASSWORD.day && month === PASSWORD.month
+      && year === PASSWORD.year && hour === PASSWORD.hour && minute === PASSWORD.minute;
+
+    if (correct) {
+      this.#busy = true;
+      store.setScreen('quest1');
+      bus.emit('app:music-start');
+      navigate('quest1');
+    } else {
+      store.incPasswordAttempts();
+      const progress = store.getProgress();
+      this.#shake(this.#inputs);
+      this.#errorEl.textContent = 'Неверная дата и время. Попробуй ещё раз 💭';
+      if (progress.passwordAttempts >= 3 && !progress.passwordHintShown) {
+        store.setPasswordHintShown();
+        this.#hintEl.classList.remove('hidden');
+      }
+      bus.emit('app:announce-assertive', { msg: 'Неверная дата и время. Попробуй ещё раз.' });
+    }
+  }
+
+  #shake(els) {
+    els.forEach(el => {
+      el.classList.remove('shake');
+      void el.offsetWidth;
+      el.classList.add('shake');
+      el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+    });
+  }
+}
+
+class QuestBlock {
+  render(questId) {
+    const cfg = QUEST_CONFIG[questId];
+    const progress = store.getProgress();
+    const questionsHTML = cfg.questions.map(q => {
+      const solved = !!progress.solvedQuestions[q.id];
+      const hintShown = !!progress.hintShown[q.id];
+      return `
+        <div class="question-block" data-qid="${ea(q.id)}">
+          ${q.label ? `<p class="question-label">${eh(q.label)}</p>` : ''}
+          ${q.question ? `<p class="question-text">${eh(q.question)}</p>` : ''}
+          <div class="field-wrap">
+            <input type="text"
+              class="quest-input"
+              placeholder="${ea(q.placeholder)}"
+              ${solved ? `readonly value="✓ Верно!" aria-label="Ответ верный"` : ''}
+              ${solved ? '' : `aria-describedby="err-${q.id}"`}
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+              data-qid="${ea(q.id)}">
+          </div>
+          <div class="error-area" id="err-${q.id}" role="alert" aria-live="assertive" aria-atomic="true"></div>
+          <div class="hint-area ${hintShown ? '' : 'hidden'}" id="hint-${q.id}">💡 ${eh(q.hint)}</div>
+        </div>`;
+    }).join('');
+
+    const el = document.getElementById('screen-quest');
+    el.innerHTML = `
+      <div class="screen-inner" style="--char-color: var(${cfg.colorVar})">
+        <p class="narrator-transition">А сейчас ты прочтёшь вопрос от ${eh(cfg.from)}:</p>
+        <div class="quest-header">
+          <div class="char-badge">
+            <span class="char-emoji" aria-hidden="true">${cfg.emoji}</span>
+            <span class="char-name">${eh(cfg.character)}</span>
+          </div>
+          <div class="balance-pill" id="balance-pill" aria-label="Баланс">
+            💰 <span id="balance-val">${fmt(store.getBalance())}</span>
+          </div>
+        </div>
+        <p class="quest-intro">${eh(cfg.intro)}</p>
+        <div class="questions-area">${questionsHTML}</div>
+        <button class="btn-primary" id="btn-check" disabled>Проверить ✓</button>
+      </div>`;
+
+    const btnCheck = document.getElementById('btn-check');
+    const allInputs = el.querySelectorAll('.quest-input:not([readonly])');
+
+    const updateBtn = () => {
+      btnCheck.disabled = [...allInputs].some(i => !i.value.trim());
+    };
+
+    allInputs.forEach(inp => inp.addEventListener('input', updateBtn));
+    updateBtn();
+
+    btnCheck.addEventListener('click', () => this.#check(questId, cfg));
+  }
+
+  #check(questId, cfg) {
+    const el = document.getElementById('screen-quest');
+    const inputs = el.querySelectorAll('.quest-input:not([readonly])');
+    if (!inputs.length) return;
+
+    let anyWrong = false;
+
+    inputs.forEach(inp => {
+      const qid = inp.dataset.qid;
+      const val = inp.value.trim().toLowerCase();
+      if (!val) return;
+
+      const errEl = document.getElementById(`err-${qid}`);
+      const hintEl = document.getElementById(`hint-${qid}`);
+
+      if (ANSWERS[qid](val)) {
+        const newBalance = store.solveQuestion(qid);
+        inp.value = '✓ Верно!';
+        inp.setAttribute('readonly', '');
+        inp.removeAttribute('aria-describedby');
+        inp.setAttribute('aria-label', 'Ответ верный');
+        inp.closest('.question-block').classList.add('solved');
+        errEl.textContent = '';
+        this.#showBalanceDelta(500, newBalance);
+        bus.emit('app:announce-polite', { msg: 'Верно! +500 рублей' });
+      } else {
+        anyWrong = true;
+        const { attempts, balance } = store.wrongAnswer(qid);
+        inp.value = '';
+        inp.classList.remove('shake');
+        void inp.offsetWidth;
+        inp.classList.add('shake');
+        inp.addEventListener('animationend', () => inp.classList.remove('shake'), { once: true });
+        errEl.textContent = WRONG_MSGS[(attempts - 1) % WRONG_MSGS.length];
+        this.#showBalanceDelta(-500, balance);
+        if (attempts >= 3 && hintEl.classList.contains('hidden')) {
+          store.showHint(qid);
+          hintEl.classList.remove('hidden');
+        }
+        bus.emit('app:announce-assertive', { msg: WRONG_MSGS[(attempts - 1) % WRONG_MSGS.length] });
+      }
+    });
+
+    const progress = store.getProgress();
+    const allSolved = cfg.questions.every(q => !!progress.solvedQuestions[q.id]);
+
+    const btn = document.getElementById('btn-check');
+    if (allSolved) {
+      const nextScreen = AFTER_QUEST[questId];
+      store.setScreen(nextScreen);
+      if (btn) btn.disabled = true;
+      bus.emit('app:fireworks', { onComplete: () => navigate(nextScreen) });
+    } else {
+      if (btn) {
+        const refreshed = el.querySelectorAll('.quest-input:not([readonly])');
+        btn.disabled = [...refreshed].some(i => !i.value.trim());
+      }
+    }
+  }
+
+  #showBalanceDelta(delta, newBalance) {
+    const valEl = document.getElementById('balance-val');
+    const pillEl = document.getElementById('balance-pill');
+    if (valEl) valEl.textContent = fmt(newBalance);
+    if (pillEl) {
+      const anim = document.createElement('span');
+      anim.className = `balance-delta-anim ${delta > 0 ? 'positive' : 'negative'}`;
+      anim.textContent = delta > 0 ? `+${delta.toLocaleString('ru-RU')} ₽` : `${delta.toLocaleString('ru-RU')} ₽`;
+      pillEl.appendChild(anim);
+      setTimeout(() => anim.remove(), 1200);
+    }
+  }
+}
+
+class WishBlock {
+  #typewriterTimer = null;
+
+  render(wishId) {
+    const cfg = WISH_CONFIG[wishId];
+    const el = document.getElementById('screen-wish');
+    
+    const transitionText = cfg.from === 'меня' 
+      ? 'А теперь — главное поздравление от меня:' 
+      : `А сейчас ты прочтёшь поздравление от ${eh(cfg.from)}:`;
+
+    el.innerHTML = `
+      <div class="screen-inner wish-inner">
+        <p class="narrator-transition">${transitionText}</p>
+        <div class="deco-line" aria-hidden="true">${eh(cfg.deco)}</div>
+        <h2 class="wish-title"><em>${eh(cfg.title)}</em></h2>
+        <div class="wish-text-wrap">
+          <p class="wish-text" id="wish-text" aria-live="polite"></p>
+        </div>
+        <div class="wish-balance" style="margin-block-start: 12px;">
+          💰 Баланс: <strong>${fmt(store.getBalance())}</strong>
+        </div>
+        <button class="btn-primary" id="btn-wish-next" style="margin-block-start:12px">${eh(cfg.button)}</button>
+      </div>`;
+
+    clearTimeout(this.#typewriterTimer);
+    this.#typewrite('wish-text', cfg.text);
+
+    document.getElementById('btn-wish-next').addEventListener('click', () => {
+      clearTimeout(this.#typewriterTimer);
+      const nextScreen = AFTER_WISH[wishId];
+      store.setScreen(nextScreen);
+      navigate(nextScreen);
+    });
+  }
+
+  #typewrite(elId, text) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.textContent = '';
+    let i = 0;
+    const step = () => {
+      if (i < text.length) {
+        el.textContent = text.slice(0, ++i);
+        
+        // Auto-scroll logic to keep text visible while typing
+        const container = el.closest('.wish-text-wrap');
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+
+        this.#typewriterTimer = setTimeout(step, TYPEWRITER_SPEED);
+      }
+    };
+    setTimeout(step, 400);
+  }
+}
+
+class FinalBlock {
+  render() {
+    const amountEl = document.getElementById('final-amount');
+    if (amountEl) amountEl.textContent = fmt(store.getBalance());
+    setTimeout(() => {
+      bus.emit('app:fireworks', {});
+    }, 600);
+  }
+}
+
+const questBlock = new QuestBlock();
+const wishBlock = new WishBlock();
+const finalBlock = new FinalBlock();
+
+new ToastBlock();
+new AnnounceBlock();
+new FireworksBlock();
+const musicBlock = new MusicBlock();
+new PasswordBlock();
+
+const { currentScreen } = store.getProgress();
+if (currentScreen !== 'password') {
+  document.getElementById('screen-password').classList.remove('active');
+  setTimeout(() => navigate(currentScreen), 50);
+}
+
+})();
+</script>
+</body>
+</html>
