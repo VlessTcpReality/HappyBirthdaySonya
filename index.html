@@ -1090,100 +1090,74 @@ class FireworksBlock {
   }
 }
 
-const MUSIC_SRC = 'forever%20Young.mp3';
-const MUSIC_YT_ID = '98l81CvW7IQ';
+const MUSIC_SRC  = 'forever%20Young.mp3';
+const MUSIC_SRC2 = 'videoplayback.webm';
 const MUSIC_SWITCH_AT = 100;
 
 class MusicBlock {
-  #audio = new Audio(MUSIC_SRC);
+  #audio1 = new Audio(MUSIC_SRC);
+  #audio2 = new Audio(MUSIC_SRC2);
   #btn = document.getElementById('music-btn');
-  #ytContainer = null;
-  #ytIframe = null;
-  #mode = 'local';
+  #active = null;
   #started = false;
   #userPaused = false;
 
   constructor() {
-    this.#audio.preload = 'auto';
-    this.#audio.volume = 1;
+    [this.#audio1, this.#audio2].forEach(a => {
+      a.preload = 'auto';
+      a.volume = 1;
+      a.addEventListener('play',  () => this.#updateBtn());
+      a.addEventListener('pause', () => this.#updateBtn());
+    });
 
-    this.#audio.addEventListener('play', () => this.#updateBtn());
-    this.#audio.addEventListener('pause', () => this.#updateBtn());
-    this.#audio.addEventListener('error', () => this.#switchToYt());
-    this.#audio.addEventListener('timeupdate', () => {
-      if (this.#mode === 'local' && this.#audio.currentTime >= MUSIC_SWITCH_AT) {
-        this.#switchToYt();
+    this.#audio2.loop = true;
+    this.#audio1.addEventListener('error',      () => this.#switchToSecond());
+    this.#audio1.addEventListener('timeupdate', () => {
+      if (this.#active === this.#audio1 && this.#audio1.currentTime >= MUSIC_SWITCH_AT) {
+        this.#switchToSecond();
       }
     });
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.#started && !this.#userPaused) this.#resumeCurrent();
+      if (!document.hidden && this.#started && !this.#userPaused) {
+        this.#active?.play().catch(() => {});
+      }
     });
 
     bus.on('app:music-start', () => this.#start());
     this.#btn.addEventListener('click', () => this.#toggle());
-
-    this.#ytContainer = document.createElement('div');
-    this.#ytContainer.style.cssText = 'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;inset-block-start:-200px;overflow:hidden;';
-    this.#ytContainer.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(this.#ytContainer);
   }
 
   #start() {
     if (this.#started) return;
     this.#started = true;
+    this.#active = this.#audio1;
     this.#btn.classList.add('visible');
     this.#btn.setAttribute('aria-hidden', 'false');
-    this.#audio.play().catch(() => this.#switchToYt());
+    this.#audio1.play().catch(() => this.#switchToSecond());
   }
 
-  #switchToYt() {
-    if (this.#mode === 'yt') return;
-    this.#mode = 'yt';
-    this.#audio.pause();
-    this.#audio.src = '';
-
-    this.#ytIframe = document.createElement('iframe');
-    this.#ytIframe.allow = 'autoplay; encrypted-media';
-    this.#ytIframe.setAttribute('allowfullscreen', '');
-    this.#ytIframe.style.cssText = 'width:1px;height:1px;border:0;';
-    this.#ytIframe.src = `https://www.youtube.com/embed/${MUSIC_YT_ID}?autoplay=1&loop=1&playlist=${MUSIC_YT_ID}&controls=0&playsinline=1&enablejsapi=1`;
-    this.#ytContainer.appendChild(this.#ytIframe);
-    this.#updateBtn();
-  }
-
-  #resumeCurrent() {
-    if (this.#mode === 'local') {
-      this.#audio.play().catch(() => this.#switchToYt());
-    } else {
-      this.#ytIframe?.contentWindow?.postMessage(
-        JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*'
-      );
-    }
+  #switchToSecond() {
+    if (this.#active === this.#audio2) return;
+    this.#audio1.pause();
+    this.#audio1.src = '';
+    this.#active = this.#audio2;
+    if (!this.#userPaused) this.#audio2.play().catch(() => {});
   }
 
   #toggle() {
-    if (!this.#started) return;
-    if (this.#mode === 'local') {
-      if (this.#audio.paused) {
-        this.#userPaused = false;
-        this.#audio.play().catch(() => {});
-      } else {
-        this.#userPaused = true;
-        this.#audio.pause();
-      }
+    if (!this.#started || !this.#active) return;
+    if (this.#active.paused) {
+      this.#userPaused = false;
+      this.#active.play().catch(() => {});
     } else {
-      const cmd = this.#userPaused ? 'playVideo' : 'pauseVideo';
-      this.#userPaused = !this.#userPaused;
-      this.#ytIframe?.contentWindow?.postMessage(
-        JSON.stringify({ event: 'command', func: cmd, args: [] }), '*'
-      );
-      this.#updateBtn();
+      this.#userPaused = true;
+      this.#active.pause();
     }
   }
 
   #updateBtn() {
-    const playing = this.#mode === 'local' ? !this.#audio.paused : !this.#userPaused;
+    const playing = this.#active ? !this.#active.paused : false;
     this.#btn.textContent = playing ? '⏸' : '🎵';
     this.#btn.setAttribute('aria-label', playing ? 'Пауза' : 'Включить музыку');
   }
