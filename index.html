@@ -1090,80 +1090,78 @@ class FireworksBlock {
   }
 }
 
-const MUSIC_SRC  = 'forever%20Young.mp3';
-const MUSIC_SRC2 = 'videoplayback.webm';
-const MUSIC_SWITCH_AT = 100;
+const TRACKS = {
+  password: 'forever Young.mp3',
+  quest1: 'JENNIE.mp3',   wish1: 'JENNIE.mp3',
+  quest2: 'JISOO.mp3',    wish2: 'JISOO.mp3',
+  quest3: 'ROSÉ.mp3',     wish3: 'ROSÉ.mp3',
+  quest4: 'LISA.mp3',     wish4: 'LISA.mp3',
+  quest5: 'videoplayback.webm', wish5: 'videoplayback.webm',
+  quest6: 'videoplayback.webm', wish6: 'videoplayback.webm',
+  wish7:  'videoplayback.webm', final:  'videoplayback.webm',
+};
 
 class MusicBlock {
-  #audio1 = new Audio(MUSIC_SRC);
-  #audio2 = new Audio(MUSIC_SRC2);
+  #audio = new Audio();
   #btn = document.getElementById('music-btn');
-  #active = null;
-  #started = false;
+  #currentSrc = null;
   #userPaused = false;
 
   constructor() {
-    [this.#audio1, this.#audio2].forEach(a => {
-      a.preload = 'auto';
-      a.volume = 1;
-      a.addEventListener('play',  () => this.#updateBtn());
-      a.addEventListener('pause', () => this.#updateBtn());
-    });
+    this.#audio.loop = true;
+    this.#audio.preload = 'auto';
+    this.#audio.volume = 1;
 
-    this.#audio2.loop = true;
-    this.#audio1.addEventListener('error',      () => this.#switchToSecond());
-    this.#audio1.addEventListener('timeupdate', () => {
-      if (this.#active === this.#audio1 && this.#audio1.currentTime >= MUSIC_SWITCH_AT) {
-        this.#switchToSecond();
-      }
-    });
+    this.#audio.addEventListener('play',  () => this.#updateBtn());
+    this.#audio.addEventListener('pause', () => this.#updateBtn());
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && this.#started && !this.#userPaused) {
-        this.#active?.play().catch(() => {});
+      if (!document.hidden && this.#currentSrc && !this.#userPaused) {
+        this.#audio.play().catch(() => {});
       }
     });
 
-    bus.on('app:music-start', () => this.#start());
+    setTimeout(() => {
+      if (!this.#currentSrc) this.#switchTrack('password');
+    }, 3000);
+
+    bus.on('app:track-change', e => this.#switchTrack(e.detail.screen));
     this.#btn.addEventListener('click', () => this.#toggle());
   }
 
-  #start() {
-    if (this.#started) return;
-    this.#started = true;
-    this.#active = this.#audio1;
+  #switchTrack(screen) {
+    const src = TRACKS[screen];
+    if (!src || src === this.#currentSrc) return;
+    this.#currentSrc = src;
+    this.#userPaused = false;
+    this.#audio.src = src;
+    this.#audio.load();
+    this.#audio.play().catch(() => {});
     this.#btn.classList.add('visible');
     this.#btn.setAttribute('aria-hidden', 'false');
-    this.#audio1.play().catch(() => this.#switchToSecond());
-  }
-
-  #switchToSecond() {
-    if (this.#active === this.#audio2) return;
-    this.#audio1.pause();
-    this.#audio1.src = '';
-    this.#active = this.#audio2;
-    if (!this.#userPaused) this.#audio2.play().catch(() => {});
+    this.#updateBtn();
   }
 
   #toggle() {
-    if (!this.#started || !this.#active) return;
-    if (this.#active.paused) {
+    if (!this.#currentSrc) return;
+    if (this.#audio.paused) {
       this.#userPaused = false;
-      this.#active.play().catch(() => {});
+      this.#audio.play().catch(() => {});
     } else {
       this.#userPaused = true;
-      this.#active.pause();
+      this.#audio.pause();
     }
   }
 
   #updateBtn() {
-    const playing = this.#active ? !this.#active.paused : false;
+    const playing = !this.#audio.paused;
     this.#btn.textContent = playing ? '⏸' : '🎵';
     this.#btn.setAttribute('aria-label', playing ? 'Пауза' : 'Включить музыку');
   }
 }
 
 const navigate = screen => {
+  bus.emit('app:track-change', { screen });
   const isQuest = screen.startsWith('quest');
   const isWish = screen.startsWith('wish');
   const domId = isQuest ? 'screen-quest' : isWish ? 'screen-wish' : `screen-${screen}`;
@@ -1234,7 +1232,6 @@ class PasswordBlock {
     if (correct) {
       this.#busy = true;
       store.setScreen('quest1');
-      bus.emit('app:music-start');
       navigate('quest1');
     } else {
       store.incPasswordAttempts();
